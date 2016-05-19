@@ -44,6 +44,7 @@ static NSString* const dnAssetsViewCellReuseIdentifier = @"DNAssetsViewCell";
 {
     self = [super init];
     if (self) {
+        _isShowPreview = YES;
         _assetsArray = [NSMutableArray new];
         _selectedAssetsArray = [NSMutableArray new];
         _assetsGroupURL = assetsGroupURL;
@@ -98,6 +99,7 @@ static NSString* const dnAssetsViewCellReuseIdentifier = @"DNAssetsViewCell";
                       statusNormalImage:[UIImage imageNamed:@"back_normal"]
                    statusHighlightImage:[UIImage imageNamed:@"back_highlight"]
                                  action:@selector(backButtonAction)];
+
     [self createBarButtonItemAtPosition:DNImagePickerNavigationBarPositionRight
                                    text:NSLocalizedStringFromTable(@"cancel", @"DNImagePicker", @"取消")
                                  action:@selector(cancelAction)];
@@ -107,6 +109,7 @@ static NSString* const dnAssetsViewCellReuseIdentifier = @"DNAssetsViewCell";
     UIBarButtonItem *item1 = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringFromTable(@"preview", @"DNImagePicker", @"预览") style:UIBarButtonItemStylePlain target:self action:@selector(previewAction)];
     [item1 setTintColor:[UIColor blackColor]];
     item1.enabled = NO;
+    
     
     UIBarButtonItem *item2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     
@@ -139,7 +142,10 @@ static NSString* const dnAssetsViewCellReuseIdentifier = @"DNAssetsViewCell";
 - (void)scrollerToBottom:(BOOL)animated
 {
     NSInteger rows = [self.imageFlowCollectionView numberOfItemsInSection:0] - 1;
-    [self.imageFlowCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:rows inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:animated];
+    if(rows >= 0){
+        [self.imageFlowCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:rows inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:animated];
+    }
+    
 }
 
 - (DNImagePickerController *)dnImagePickerController
@@ -224,7 +230,10 @@ static NSString* const dnAssetsViewCellReuseIdentifier = @"DNAssetsViewCell";
         return NO;
     }
     UIBarButtonItem *firstItem = self.toolbarItems.firstObject;
-    firstItem.enabled = YES;
+    if(_isShowPreview){
+        firstItem.enabled = YES;
+    }
+    
     if (self.selectedAssetsArray.count >= kDNImageFlowMaxSeletedNumber) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedStringFromTable(@"alertTitle", @"DNImagePicker", nil) message:NSLocalizedStringFromTable(@"alertContent", @"DNImagePicker", nil) delegate:self cancelButtonTitle:NSLocalizedStringFromTable(@"alertButton", @"DNImagePicker", nil) otherButtonTitles:nil, nil];
         [alert show];

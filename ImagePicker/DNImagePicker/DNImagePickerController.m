@@ -66,10 +66,15 @@ ALAssetsFilter * ALAssetsFilterFromDNImagePickerControllerFilterType(DNImagePick
                  NSURL *assetsGroupURL = [assetsGroup valueForProperty:ALAssetsGroupPropertyURL];
                  DNAlbumTableViewController *albumTableViewController = [[DNAlbumTableViewController alloc] init];
                  DNImageFlowViewController *imageFlowController = [[DNImageFlowViewController alloc] initWithGroupURL:assetsGroupURL];
+                 if(self.filterType == DNImagePickerFilterTypeVideos){
+                     imageFlowController.isShowPreview = NO;
+                 }else{
+                     imageFlowController.isShowPreview = YES;
+                 }
                  [self setViewControllers:@[albumTableViewController,imageFlowController]];
              }
          }
-                                   failureBlock:^(NSError *error)
+        failureBlock:^(NSError *error)
          {
              [self showAlbumList];
          }];

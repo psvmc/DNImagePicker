@@ -15,6 +15,9 @@
 
 @property (nonatomic, weak) IBOutlet UIButton *button;
 - (IBAction)buttonAction:(id)sender;
+
+@property (nonatomic, weak) IBOutlet UIButton *buttonVideo;
+- (IBAction)buttonVideoAction:(id)sender;
 @end
 
 @implementation ViewController
@@ -27,6 +30,14 @@
 - (void)buttonAction:(id)sender
 {
     DNImagePickerController *imagePicker = [[DNImagePickerController alloc] init];
+    imagePicker.filterType = DNImagePickerFilterTypePhotos;
+    imagePicker.imagePickerDelegate = self;
+    [self presentViewController:imagePicker animated:YES completion:nil];
+}
+
+- (void)buttonVideoAction:(id)sender{
+    DNImagePickerController *imagePicker = [[DNImagePickerController alloc] init];
+    imagePicker.filterType = DNImagePickerFilterTypeVideos;
     imagePicker.imagePickerDelegate = self;
     [self presentViewController:imagePicker animated:YES completion:nil];
 }

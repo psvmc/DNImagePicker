@@ -11,27 +11,8 @@
 
 @implementation UIViewController (DNImagePicker)
 - (void)createBarButtonItemAtPosition:(DNImagePickerNavigationBarPosition)position statusNormalImage:(UIImage *)normalImage statusHighlightImage:(UIImage *)highlightImage action:(SEL)action {
-    
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    UIEdgeInsets insets = UIEdgeInsetsZero;
-    switch (position) {
-        case DNImagePickerNavigationBarPositionLeft:
-            insets = UIEdgeInsetsMake(0, -20, 0, 20);
-            break;
-        case DNImagePickerNavigationBarPositionRight:
-            insets = UIEdgeInsetsMake(0, 13, 0, -13);
-            break;
-        default:
-            break;
-    }
-    
-    [button setImageEdgeInsets:insets];
-    [button setFrame:CGRectMake(0, 0, 44, 44)];
-    [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-    [button setImage:normalImage forState:UIControlStateNormal];
-    [button setImage:highlightImage forState:UIControlStateHighlighted];
-    
-    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+
+    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithImage:normalImage style:UIBarButtonItemStylePlain target:self action:action];
     switch (position) {
         case DNImagePickerNavigationBarPositionLeft:
             self.navigationItem.leftBarButtonItem = barButtonItem;
@@ -59,17 +40,21 @@
             break;
     }
     
+    UIColor *tintColor = self.navigationController.navigationBar.tintColor;
+    
     [button setTitleEdgeInsets:insets];
     [button setFrame:CGRectMake(0, 0, 64, 30)];
     [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
     [button setTitle:text forState:UIControlStateNormal];
     button.titleLabel.font = [UIFont systemFontOfSize:15.0f];
-    [button setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
-    [button setTitleColor:[UIColor hexStringToColor:@"808080"] forState:UIControlStateHighlighted];
+    [button setTitleColor:tintColor forState:UIControlStateNormal];
+    
+    [button setTitleColor:[UIColor hexStringToColor:@"666666"] forState:UIControlStateHighlighted];
     
     UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
     switch (position) {
         case DNImagePickerNavigationBarPositionLeft:
+            
             self.navigationItem.leftBarButtonItem = barButtonItem;
             break;
         case DNImagePickerNavigationBarPositionRight:

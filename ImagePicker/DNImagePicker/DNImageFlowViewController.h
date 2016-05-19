@@ -11,4 +11,5 @@
 @interface DNImageFlowViewController : UIViewController
 
 - (instancetype)initWithGroupURL:(NSURL *)assetsGroupURL;
+@property(assign) BOOL isShowPreview;
 @end
