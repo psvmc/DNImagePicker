@@ -57,11 +57,6 @@ static NSString * const reuseIdentifier = @"Cell";
     return cell;
 }
 
-- (void)getAsset:(DNAsset *) dnasset{
-    
-    
-}
-
 - (void)setCell:(CollectionViewCell *)cell asset:(ALAsset *)asset
 {
     
