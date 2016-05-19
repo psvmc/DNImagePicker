@@ -45,41 +45,21 @@ static NSString * const reuseIdentifier = @"Cell";
     
     DNAsset *dnasset = self.imageArray[indexPath.row];
     
-    ALAssetsLibrary *lib = [ALAssetsLibrary new];
     __block CollectionViewCell *blockCell = cell;
     __weak typeof(self) weakSelf = self;
-    [lib assetForURL:dnasset.url resultBlock:^(ALAsset *asset){
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        if (asset) {
-            [strongSelf setCell:blockCell asset:asset];
-        } else {
-            // On iOS 8.1 [library assetForUrl] Photo Streams always returns nil. Try to obtain it in an alternative way
-            [lib enumerateGroupsWithTypes:ALAssetsGroupPhotoStream
-                                   usingBlock:^(ALAssetsGroup *group, BOOL *stop)
-             {
-                 [group enumerateAssetsWithOptions:NSEnumerationReverse
-                                        usingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
-                     
-                     if([[result valueForProperty:ALAssetPropertyAssetURL] isEqual:dnasset.url])
-                     {
-                         [strongSelf setCell:blockCell asset:result];
-                         *stop = YES;
-                     }
-                 }];
-             }
-                             failureBlock:^(NSError *error)
-             {
-                 [strongSelf setCell:blockCell asset:nil];
-             }];
-        }
-        
-    } failureBlock:^(NSError *error){
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf setCell:blockCell asset:nil];
+    
+    [DNAsset getALAsset:dnasset callback:^(ALAsset *alAsset)  {
+        [weakSelf setCell:blockCell asset:alAsset];
     }];
     
     
+    
     return cell;
+}
+
+- (void)getAsset:(DNAsset *) dnasset{
+    
+    
 }
 
 - (void)setCell:(CollectionViewCell *)cell asset:(ALAsset *)asset
@@ -89,32 +69,39 @@ static NSString * const reuseIdentifier = @"Cell";
         cell.imageView.image = [UIImage imageNamed:@"assets_placeholder_picture"];
         cell.textLabel.hidden = YES;
         return;
+    }else{
+        cell.textLabel.hidden = NO;
     }
     
-    cell.textLabel.hidden = NO;
-    UIImage *image;
-    NSString *string;
-    if (self.isFullImage) {
-        NSNumber *orientationValue = [asset valueForProperty:ALAssetPropertyOrientation];
-        UIImageOrientation orientation = UIImageOrientationUp;
-        if (orientationValue != nil) {
-            orientation = [orientationValue intValue];
+    __block UIImage *image;
+    __block NSString *string;
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        if (self.isFullImage) {
+            NSNumber *orientationValue = [asset valueForProperty:ALAssetPropertyOrientation];
+            UIImageOrientation orientation = UIImageOrientationUp;
+            if (orientationValue != nil) {
+                orientation = [orientationValue intValue];
+            }
+            
+            image = [UIImage imageWithCGImage:asset.thumbnail];
+            string = [NSString stringWithFormat:@"fileSize:%lld k\nwidth:%.0f\nheiht:%.0f",asset.defaultRepresentation.size/1000,[[asset defaultRepresentation] dimensions].width, [[asset defaultRepresentation] dimensions].height];
+            
+        } else {
+            image = [UIImage imageWithCGImage:asset.defaultRepresentation.fullScreenImage];
+            string = [NSString stringWithFormat:@"fileSize:%lld k\nwidth:%.0f\nheiht:%.0f",asset.defaultRepresentation.size/1000,image.size.width,image.size.height];
         }
         
-        image = [UIImage imageWithCGImage:asset.thumbnail];
-//        image = [UIImage imageWithCGImage:asset.thumbnail scale:0.1 orientation:orientation];
-        
-        string = [NSString stringWithFormat:@"fileSize:%lld k\nwidth:%.0f\nheiht:%.0f",asset.defaultRepresentation.size/1000,[[asset defaultRepresentation] dimensions].width, [[asset defaultRepresentation] dimensions].height];
-        
-    } else {
-        image = [UIImage imageWithCGImage:asset.defaultRepresentation.fullScreenImage];
-        
-        string = [NSString stringWithFormat:@"fileSize:%lld k\nwidth:%.0f\nheiht:%.0f",asset.defaultRepresentation.size/1000,image.size.width,image.size.height];
-    }
-   
-    cell.textLabel.text = string;
-    cell.imageView.image = image;
-
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            //在主线程中更新UI代码
+            cell.textLabel.text = string;
+            cell.imageView.image = image;
+        });
+    });
+    
+    
+    
+    
 }
 
 #define kSizeThumbnailCollectionView  self.view.frame.size.width/2

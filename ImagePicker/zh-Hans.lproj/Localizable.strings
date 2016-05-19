@@ -6,6 +6,6 @@
   Copyright (c) 2015年 Dennis. All rights reserved.
 */
 "loadFailed" = "加载失败";
-"seletedImageTitle" = "选择的图片";
+"seletedImageTitle" = "选择的图片或视频";
 "add" = "添加照片";
 "CFBundleDisplayName" = "DNImagePicker";
